@@ -5,12 +5,11 @@ import re
 from string import punctuation
 
 def get_all_tokenized_reviews():
-    list_of_docs = []
+    list_of_reviews = []
     ps = nltk.stem.PorterStemmer()
     #go through all files
     for doc_num, file_path in enumerate(os.listdir('yelp')):
         #open each file
-        current_file_tokenized_reviews = []
         with open('yelp/'+file_path, 'r') as file:
             #load json into a python dict
             file_as_dict = json.load(file)
@@ -46,27 +45,59 @@ def get_all_tokenized_reviews():
                                 #if its a word, stem it
                                 new_arr.append(ps.stem(word))
                             #save the tokenized review
-                current_file_tokenized_reviews.append(new_arr)
-        list_of_docs.append(current_file_tokenized_reviews)
-    return list_of_docs
+                list_of_reviews.append(new_arr)
+    return list_of_reviews
 
 from collections import defaultdict
 
-def total_term_frequency(list_of_docs):
+def total_term_frequency(list_of_tokenized_reviews):
     # Create a defaultdict to store number of total token occurrences
     token_counts = defaultdict(int)
 
     # Iterate through the nested lists
-    for current_file_tokenized_reviews in list_of_docs:
-        for review in current_file_tokenized_reviews:
-            for token in review:
-                # Increment the count for each token
-                token_counts[token] += 1
+    for review in list_of_tokenized_reviews:
+        for token in review:
+            # Increment the count for each token
+            token_counts[token] += 1
 
     # Convert defaultdict to a regular dictionary
     token_counts_dict = dict(token_counts)
 
     return token_counts_dict
+
+def get_all_bigrams(list_of_tokenized_reviews):
+    all_bigrams = []
+    for review in list_of_tokenized_reviews:
+        for i in range(len(review)-1):
+            all_bigrams.append((review[i], review[i+1]))
+    return all_bigrams
+
+
+def total_bigram_freqency(all_bigrams):
+    bigram_counts = defaultdict(int)
+
+    # Iterate through the nested lists
+    for bigram in all_bigrams:
+        # Increment the count for each bigram
+        bigram_counts[bigram] += 1
+
+    return dict(bigram_counts)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 from scipy.optimize import curve_fit
 import numpy as np
